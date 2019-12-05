@@ -5,7 +5,7 @@
 %% \usepacage{placeins}
 
 \usepackage{array}
-\usepackage{geometry}[a4paper, left=0.2cm, top=0.2cm]
+\usepackage[margin=2cm]{geometry}%[a4paper, left=0.2cm, top=0.2cm]
 \usepackage{caption}
 
 % count steps in algorithm
@@ -116,7 +116,7 @@ $Y$ is a multiset over $M$
   \end{tabular}
 \end{minipage}
 
-\paragraph{CNF transformation}
+\paragraph{CNF transformation}\hfill\vspace{0.3cm}
 \begin{minipage}{\linewidth}
   \setcounter{step}{0}
   \newcommand{\cnft}{ & \implies_\text{OCNF} & }
@@ -124,6 +124,7 @@ $Y$ is a multiset over $M$
   \newcommand{\mst}{ & \implies_\text{MS} & }
   \newcommand{\skt}{ & \implies_\text{SK} & }
   \centering
+  
   \begin{tabular}{l L C L}
     \countnprint{step} & \multicolumn{3}{l}{eliminate trivial subformulas} \\
     \countnprint{step} & \ifthen{\pol{H, p} = 1}{H\subfreplp{F} \cnft H\subfreplp{P(x_1, ..., x_n)} \land \forall x_1, ..., x_n (P(x_1, ..., x_n) \implies F)} \\
