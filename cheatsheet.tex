@@ -2,10 +2,10 @@
 
 \usepackage{amsmath}
 
-%% \usepacage{placeins}
+\usepackage{placeins}
 
 \usepackage{array}
-\usepackage[margin=2cm]{geometry}%[a4paper, left=0.2cm, top=0.2cm]
+\usepackage[margin=1cm]{geometry}%[a4paper, left=0.2cm, top=0.2cm]a
 \usepackage{caption}
 
 % count steps in algorithm
@@ -20,14 +20,12 @@
 \newcommand{\subfrepl}[2]{[#1]_{#2}} % subformula replacement
 \newcommand{\subfreplp}[1]{\subfrepl{#1}{p}} % subformula replacement at position p (convenience)
 \newcommand{\subfreplq}[1]{\subfrepl{#1}{q}} % subformula replacement at position q (convenience)
-%% \newcommand{\issat}{\text{ is sat }}
-%% \newcommand{\isunsat}{\text{ is unsat }}
 \newcommand{\countnprint}[1]{\stepcounter{#1}\arabic{#1}} % increment counter and print
 \newcommand{\pol}[1]{pol(#1)} % polarity
 \newcommand{\ifthen}[2]{if\ #1:\ #2} % if ... then ... as text in math mode
+\newcommand{\tablehead}[1]{{\bfseries{#1}}\\[5pt]}
 
 \begin{document}
-
 \section{Multiset extensions}
 \paragraph{Dershowitz-Manna}
 \[
@@ -45,15 +43,32 @@ S_1 \mulsucc^1 S_2 \iff \exists x \in S_1, Y: S_2 = (S_1 - \set{x}) \cup Y \land
 $Y$ is a multiset over $M$
 
 \section{Propositional Logic}
-\begin{minipage}{\linewidth}
-  \bf Polarities
+\begin{minipage}[t]{0.4\textwidth}
+  \raggedright
+  \tablehead{Polarities}
   \begin{tabular}{L C L}
     \pol{F, \epsilon} & \defi & 1\\
     \pol{\neg F, 1p} & \defi & -\pol{F, p}\\
-    \pol{F_1 \circ F_2} & \defi & pol{F_i, p}\\
+    \pol{F_1 \circ F_2} & \defi & \pol{F_i, p}\\
     \pol{F_1 \implies F_2} & \defi & -\pol{F_1, p}\\
     \pol{F_1 \implies F_2} & \defi & \pol{F_2, p}\\
     \pol{F_1 \iff F_2} & \defi & 0\\
+  \end{tabular}
+\end{minipage}
+%
+\begin{minipage}[t]{0.55\textwith}
+  \raggedleft
+  \tablehead{CDCL}
+  \newcommand{\cdcl}{\implies_{\text{CDCL}}}
+  \begin{tabular}{l L C L}
+    Unit prop. & M \| N \cup \set{C \lor L} & \cdcl & M L \| N \cup \set{C \lor L}\\
+    Decide & M \| N & \cdcl & M L^d \| N \\
+    Fail & M \| N \cup \set{C} & \cdcl & \text{fail}\\
+    Backjump & M' L^d M'' \| N & \cdcl & M' L' \| N\\
+    & \multicolumn{3}{L}{\text{on backjump clause } C \lor L'}\\
+    Learn & M \| N & \cdcl & M \| N \cup \set{C}\\
+    Forget & M \| N \cup \set{C} & \cdcl & M \| N \\
+    Restart & M \| N & \cdcl & \epsilon \| N\\
   \end{tabular}
 \end{minipage}
 
@@ -64,11 +79,13 @@ $Y$ is a multiset over $M$
 %%   \pol{H, p} = 0: & H\subfrepl{F}{p} \issat \iff H\subfrepl{Q}{p} \land Q \iff F \issat\\
 %% \end{tabular}
 
-\paragraph{CNF transformation}
+\vspace{0.5cm}
+
 \begin{minipage}{\linewidth}
+  \raggedright
   \setcounter{step}{0}
   \newcommand{\cnftrans}{\implies_{\text{OCNF}}}
-  \centering
+  \tablehead{CNF transformation}
   \begin{tabular}{L L C L}
     \countnprint{step}. & \text{eliminate trivial subformulas} & &\\
     \countnprint{step}. & \text{replace beneficial subformulas} & &\\
@@ -87,25 +104,10 @@ $Y$ is a multiset over $M$
   \end{tabular}
 \end{minipage}
 
-\paragraph{CDCL}
-\newcommand{\cdcl}{\implies_{\text{CDCL}}}
+\section{First-order logic}
 \begin{minipage}{\linewidth}
-  \centering
-  \begin{tabular}{l L C L}
-    Unit prop. & M \| N \cup \set{C \lor L} & \cdcl & M L \| N \cup \set{C \lor L}\\
-    Decide & M \| N & \cdcl & M L^d \| N \\
-    Fail & M \| N \cup \set{C} & \cdcl & \text{fail}\\
-    Backjump & M' L^d M'' \| N & \cdcl & M' L' \| N\\
-    & \multicolumn{3}{L}{\text{on backjump clause } C \lor L'}\\
-    Learn & M \| N & \cdcl & M \| N \cup \set{C}\\
-    Forget & M \| N \cup \set{C} & \cdcl & M \| N \\
-    Restart & M \| N & \cdcl & \epsilon \| N\\
-  \end{tabular}
-\end{minipage}
-
-\paragraph{Substitutions}
-\begin{minipage}{\linewidth}
-  \centering
+  \raggedright
+  \tablehead{Substitutions}
   \begin{tabular}{L C L L}
     f(s_1, ..., s_n) \sigma & = & f(s_1 \sigma, ..., s_n \sigma) & \text{ similarly for predicates }\\
     \bot \sigma & = & \bot & \text{ similarly for } \top \\
@@ -116,15 +118,14 @@ $Y$ is a multiset over $M$
   \end{tabular}
 \end{minipage}
 
-\paragraph{CNF transformation}\hfill\vspace{0.3cm}
 \begin{minipage}{\linewidth}
   \setcounter{step}{0}
   \newcommand{\cnft}{ & \implies_\text{OCNF} & }
   \newcommand{\nnft}{ & \implies_\text{NNF} & }
   \newcommand{\mst}{ & \implies_\text{MS} & }
   \newcommand{\skt}{ & \implies_\text{SK} & }
-  \centering
-  
+  \raggedright
+  \tablehead{CNF transformation}
   \begin{tabular}{l L C L}
     \countnprint{step} & \multicolumn{3}{l}{eliminate trivial subformulas} \\
     \countnprint{step} & \ifthen{\pol{H, p} = 1}{H\subfreplp{F} \cnft H\subfreplp{P(x_1, ..., x_n)} \land \forall x_1, ..., x_n (P(x_1, ..., x_n) \implies F)} \\
