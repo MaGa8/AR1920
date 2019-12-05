@@ -1,0 +1,5 @@
+# temporaries and auxiliaries
+*~
+*.log
+*.aux
+*.out
