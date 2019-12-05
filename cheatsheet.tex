@@ -1,0 +1,153 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+
+%% \usepacage{placeins}
+
+\usepackage{array}
+\usepackage{geometry}[a4paper, left=0.2cm, top=0.2cm]
+\usepackage{caption}
+
+% count steps in algorithm
+\newcounter{step}
+
+\newcolumntype{L}{>{$}l<{$}}
+\newcolumntype{C}{>{$}c<{$}}
+
+\newcommand{\mulsucc}{\succ_{mul}} % multiset ordering
+\newcommand{\set}[1]{\{#1\}} % set
+\newcommand{\defi}{:=} % define
+\newcommand{\subfrepl}[2]{[#1]_{#2}} % subformula replacement
+\newcommand{\subfreplp}[1]{\subfrepl{#1}{p}} % subformula replacement at position p (convenience)
+\newcommand{\subfreplq}[1]{\subfrepl{#1}{q}} % subformula replacement at position q (convenience)
+%% \newcommand{\issat}{\text{ is sat }}
+%% \newcommand{\isunsat}{\text{ is unsat }}
+\newcommand{\countnprint}[1]{\stepcounter{#1}\arabic{#1}} % increment counter and print
+\newcommand{\pol}[1]{pol(#1)} % polarity
+\newcommand{\ifthen}[2]{if\ #1:\ #2} % if ... then ... as text in math mode
+
+\begin{document}
+
+\section{Multiset extensions}
+\paragraph{Dershowitz-Manna}
+\[
+S_1 \mulsucc S_2 \iff \exists X, Y \in M (\forall y \in Y \exists x \in X: x \succ y)
+\]
+\paragraph{Huet-Oppen}
+\[
+S_1 \mulsucc^{HO} S_2 \iff S_1 \neq S_2 \land \forall m \in M: (S_2(m) > S_1(m) \implies \exists m' \in M: m' \succ m \land S_1(m') > S_2(m'))
+\]
+\paragraph{Transitive Closure}
+$\mulsucc^*$ is the transitive closure of $\mulsucc^1$ given by
+\[
+S_1 \mulsucc^1 S_2 \iff \exists x \in S_1, Y: S_2 = (S_1 - \set{x}) \cup Y \land \forall y \in Y: x \succ y
+\]
+$Y$ is a multiset over $M$
+
+\section{Propositional Logic}
+\begin{minipage}{\linewidth}
+  \bf Polarities
+  \begin{tabular}{L C L}
+    \pol{F, \epsilon} & \defi & 1\\
+    \pol{\neg F, 1p} & \defi & -\pol{F, p}\\
+    \pol{F_1 \circ F_2} & \defi & pol{F_i, p}\\
+    \pol{F_1 \implies F_2} & \defi & -\pol{F_1, p}\\
+    \pol{F_1 \implies F_2} & \defi & \pol{F_2, p}\\
+    \pol{F_1 \iff F_2} & \defi & 0\\
+  \end{tabular}
+\end{minipage}
+
+%% \paragraph{Subformula replacment}
+%% \begin{tabular}{L L}
+%%   \pol{H, p} = 1: & H\subfrepl{F}{p} \issat \iff H\subfrepl{Q}{p} \land Q \implies F \issat\\
+%%   \pol{H, p} = -1: & H\subfrepl{F}{p} \issat \iff H\subfrepl{Q}{p} \land F \implies Q \issat\\
+%%   \pol{H, p} = 0: & H\subfrepl{F}{p} \issat \iff H\subfrepl{Q}{p} \land Q \iff F \issat\\
+%% \end{tabular}
+
+\paragraph{CNF transformation}
+\begin{minipage}{\linewidth}
+  \setcounter{step}{0}
+  \newcommand{\cnftrans}{\implies_{\text{OCNF}}}
+  \centering
+  \begin{tabular}{L L C L}
+    \countnprint{step}. & \text{eliminate trivial subformulas} & &\\
+    \countnprint{step}. & \text{replace beneficial subformulas} & &\\
+    & \pol{H, p} = 1: H\subfreplp{F} & \cnftrans & H\subfreplp{Q} \land Q \implies F \\
+    & \pol{H, p} = -1: H\subfreplp{F} & \cnftrans & H\subfreplp{Q} \land F \implies Q \\
+    & \pol{H, p} = 0: H\subfreplp{F} & \cnftrans & H\subfreplp{Q} \land F \iff Q \\
+    \countnprint{step}. & \text{eliminate equivalences} & &\\
+    & \pol{H, p} \in \set{0, 1}: H\subfreplp{F \iff G} & \cnftrans & H\subfreplp{(F \implies G) \land (G \implies F)}\\
+    & \pol{H, p} = -1: H\subfreplp{F \iff G} & \cnftrans & H\subfreplp{(F \land G) \lor (\neg F \land \neg G)}\\
+    \countnprint{step}. & H\subfrepl{F \iff G}{p} & \cnftrans & H\subfrepl{(F \implies G) \land (G \implies F)}{p} \\
+    \countnprint{step}. & H\subfrepl{F \implies G}{p} & \cnftrans & H\subfrepl{\neg F \lor G}{p} \\
+    \countnprint{step}. & H\subfrepl{\neg (F \lor G)}{p} & \cnftrans & H\subfrepl{\neg F \land \neg G}{p}\\
+    & H\subfrepl{\neg (F \land G)}{p} & \cnftrans & H\subfrepl{\neg F \lor \neg G}{p}\\
+    \countnprint{step}. & H\subfrepl{\neg\neg F}{p} & \cnftrans & H\subfrepl{F}{p}\\
+    \countnprint{step}. & H\subfrepl{(F \land F') \lor G}{p} & \cnftrans & H\subfrepl{(F \lor G) \land (F' \lor G)}{p}\\
+  \end{tabular}
+\end{minipage}
+
+\paragraph{CDCL}
+\newcommand{\cdcl}{\implies_{\text{CDCL}}}
+\begin{minipage}{\linewidth}
+  \centering
+  \begin{tabular}{l L C L}
+    Unit prop. & M \| N \cup \set{C \lor L} & \cdcl & M L \| N \cup \set{C \lor L}\\
+    Decide & M \| N & \cdcl & M L^d \| N \\
+    Fail & M \| N \cup \set{C} & \cdcl & \text{fail}\\
+    Backjump & M' L^d M'' \| N & \cdcl & M' L' \| N\\
+    & \multicolumn{3}{L}{\text{on backjump clause } C \lor L'}\\
+    Learn & M \| N & \cdcl & M \| N \cup \set{C}\\
+    Forget & M \| N \cup \set{C} & \cdcl & M \| N \\
+    Restart & M \| N & \cdcl & \epsilon \| N\\
+  \end{tabular}
+\end{minipage}
+
+\paragraph{Substitutions}
+\begin{minipage}{\linewidth}
+  \centering
+  \begin{tabular}{L C L L}
+    f(s_1, ..., s_n) \sigma & = & f(s_1 \sigma, ..., s_n \sigma) & \text{ similarly for predicates }\\
+    \bot \sigma & = & \bot & \text{ similarly for } \top \\
+    (u \approx v) \sigma & = & (u \sigma \approx v \sigma) & \\
+    \neg F \sigma & = & \neg (F \sigma) & \\
+    (F \circ G) \sigma & = & (F \sigma \circ G \sigma) & \\
+    (\mathbf{Q}x F)\sigma & = & \mathbf{Q}z(F \sigma[x \mapsto z]) & \text{ z is fresh } \\
+  \end{tabular}
+\end{minipage}
+
+\paragraph{CNF transformation}
+\begin{minipage}{\linewidth}
+  \setcounter{step}{0}
+  \newcommand{\cnft}{ & \implies_\text{OCNF} & }
+  \newcommand{\nnft}{ & \implies_\text{NNF} & }
+  \newcommand{\mst}{ & \implies_\text{MS} & }
+  \newcommand{\skt}{ & \implies_\text{SK} & }
+  \centering
+  \begin{tabular}{l L C L}
+    \countnprint{step} & \multicolumn{3}{l}{eliminate trivial subformulas} \\
+    \countnprint{step} & \ifthen{\pol{H, p} = 1}{H\subfreplp{F} \cnft H\subfreplp{P(x_1, ..., x_n)} \land \forall x_1, ..., x_n (P(x_1, ..., x_n) \implies F)} \\
+    & \ifthen{\pol{H, p} = -1}{H\subfreplp{F} \cnft H\subfreplp{P(x_1, ..., x_n)} \land \forall x_1, ..., x_n (F \implies P(x_1, ..., x_n))} \\
+    & \ifthen{\pol{H, p} = 0}{H\subfreplp{F} \cnft H\subfreplp{P(x_1, ..., x_n)} \land \forall x_1, ..., x_n (F \iff P(x_1, ..., x_n))} \\
+    \countnprint{step} & \ifthen{\pol{H, p} \in \set{0, 1}}{H\subfreplp{F \iff G} \nnft H\subfreplp{(F \implies G) \land (G \implies F)}} \\
+    & \ifthen{\pol{H, p} = -1}{H\subfreplp{F \iff G} \nnft H\subfreplp{(F \land G) \lor (\neg F \land \neg G)}} \\
+    & H\subfreplp{F \implies G} \nnft H\subfreplp{\neg F \lor G}\\
+    & H\subfreplp{\neg\neg F} \nnft H\subfreplp{F} \\
+    & H\subfreplp{\neg(F \lor G)} \nnft H\subfreplp{\neg F \land \neg G}\\
+    & H\subfreplp{\neg(F \land G)} \nnft H\subfreplp{\neg F \lor \neg G}\\
+    & H\subfreplp{\neg \mathbf{Q} x F} \nnft H\subfreplp{\mathbf{\bar{Q}} x \neg F}\\
+    \countnprint{step} & \multicolumn{3}{l}{Miniscoping: $x$ free in $F$, $F'$; $x$ not free in $G$} \\
+    & H\subfreplp{\mathbf{Q} x (F \land G)} \mst H\subfreplp{(\mathbf{Q} x F) \land G} \\
+    & H\subfreplp{\mathbf{Q} x (F \lor G)} \mst H\subfreplp{(\mathbf{Q} x F) \lor G} \\
+    & H\subfreplp{\forall (F \land F')} \mst H\subfreplp{(\forall x F) \land (\forall x F')}\\
+    & H\subfreplp{\exists (F \lor F')} \mst H\subfreplp{(\exists x F) \lor (\exists x F')}\\
+    & H\subfreplp{\mathbf{Q} x G} \mst H\subfreplp{G}\\
+    \countnprint{step} & \multicolumn{3}{l}{Rename variables s.t. same variable isn't bound by two quantifiers}\\
+    \countnprint{step} & H\subfreplp{\exists x F} \skt H\subfreplp{F\set{x \mapsto f(y_1, ..., y_n)}} \\
+    & \multicolumn{3}{l}{for minimal length $p$, free variables $y_i$}\\
+    \countnprint{step} & H\subfreplp{(\forall x F) \circ G} \cnft H\subfreplp{\forall x (F \circ G)} \\
+    & H\subfreplp{(F \land F') \lor G} \cnft H\subfreplp{(F \lor G) \land (F' \lor G)}\\
+  \end{tabular}
+\end{minipage}
+
+\end{document}
