@@ -26,21 +26,16 @@
 \newcommand{\tablehead}[1]{{\bfseries{#1}}\\[5pt]}
 
 \begin{document}
-\section{Multiset extensions}
-\paragraph{Dershowitz-Manna}
-\[
-S_1 \mulsucc S_2 \iff \exists X, Y \in M (\forall y \in Y \exists x \in X: x \succ y)
-\]
-\paragraph{Huet-Oppen}
-\[
-S_1 \mulsucc^{HO} S_2 \iff S_1 \neq S_2 \land \forall m \in M: (S_2(m) > S_1(m) \implies \exists m' \in M: m' \succ m \land S_1(m') > S_2(m'))
-\]
-\paragraph{Transitive Closure}
-$\mulsucc^*$ is the transitive closure of $\mulsucc^1$ given by
-\[
-S_1 \mulsucc^1 S_2 \iff \exists x \in S_1, Y: S_2 = (S_1 - \set{x}) \cup Y \land \forall y \in Y: x \succ y
-\]
-$Y$ is a multiset over $M$
+\section{Basics}
+\paragraph{Multiset extensions}
+
+\begin{align*}
+  S_1 \mulsucc S_2 & \iff \exists X, Y \in M (\forall y \in Y \exists x \in X: x \succ y)\\
+  S_1 \mulsucc^{HO} S_2 & \iff S_1 \neq S_2 \land \forall m \in M: (S_2(m) > S_1(m) \implies \exists m' \in M: m' \succ m \land S_1(m') > S_2(m'))\\
+  S_1 \mulsucc^1 S_2 & \iff \exists x \in S_1, Y: S_2 = (S_1 - \set{x}) \cup Y \land \forall y \in Y: x \succ y
+\end{align*}
+$X, Y$ are multisets over base set $M$.\\
+$\mulsucc^*$ is the transitive closure of $\mulsucc^1$ given by.\\
 
 \section{Propositional Logic}
 \begin{minipage}[t]{0.4\textwidth}
@@ -56,7 +51,7 @@ $Y$ is a multiset over $M$
   \end{tabular}
 \end{minipage}
 %
-\begin{minipage}[t]{0.55\textwith}
+\begin{minipage}[t]{0.55\textwidth}
   \raggedleft
   \tablehead{CDCL}
   \newcommand{\cdcl}{\implies_{\text{CDCL}}}
@@ -141,8 +136,8 @@ $Y$ is a multiset over $M$
     \countnprint{step} & \multicolumn{3}{l}{Miniscoping: $x$ free in $F$, $F'$; $x$ not free in $G$} \\
     & H\subfreplp{\mathbf{Q} x (F \land G)} \mst H\subfreplp{(\mathbf{Q} x F) \land G} \\
     & H\subfreplp{\mathbf{Q} x (F \lor G)} \mst H\subfreplp{(\mathbf{Q} x F) \lor G} \\
-    & H\subfreplp{\forall (F \land F')} \mst H\subfreplp{(\forall x F) \land (\forall x F')}\\
-    & H\subfreplp{\exists (F \lor F')} \mst H\subfreplp{(\exists x F) \lor (\exists x F')}\\
+    & H\subfreplp{\forall x (F \land F')} \mst H\subfreplp{(\forall x F) \land (\forall x F')}\\
+    & H\subfreplp{\exists x (F \lor F')} \mst H\subfreplp{(\exists x F) \lor (\exists x F')}\\
     & H\subfreplp{\mathbf{Q} x G} \mst H\subfreplp{G}\\
     \countnprint{step} & \multicolumn{3}{l}{Rename variables s.t. same variable isn't bound by two quantifiers}\\
     \countnprint{step} & H\subfreplp{\exists x F} \skt H\subfreplp{F\set{x \mapsto f(y_1, ..., y_n)}} \\
